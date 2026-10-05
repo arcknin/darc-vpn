@@ -4,7 +4,8 @@ umask 077
 [[ $EUID -eq 0 ]] || { echo 'Execute como root.' >&2; exit 1; }
 for cmd in nginx certbot python3 systemctl; do command -v "$cmd" >/dev/null; done
 nginx -t
-# Both names must point directly to this VPS before ACME HTTP validation.
+# WireGuard needs direct DNS. The HTTPS-only dashboard may use Cloudflare proxy;
+# ACME validates HTTP reachability rather than requiring the origin IP in DNS.
 python3 - <<'PY'
 import socket
 for host in ('vpn.darcanix.com', 'dashboard-vpn.darcanix.com'):
@@ -12,7 +13,9 @@ for host in ('vpn.darcanix.com', 'dashboard-vpn.darcanix.com'):
         ips = set(socket.gethostbyname_ex(host)[2])
     except OSError:
         raise SystemExit(f'DNS ainda indisponível: {host}')
-    if ips != {'187.124.240.109'}:
+    if not ips:
+        raise SystemExit(f'DNS ainda indisponível: {host}')
+    if host == 'vpn.darcanix.com' and ips != {'187.124.240.109'}:
         raise SystemExit(f'{host}: configure A=187.124.240.109, Somente DNS, antes de executar.')
 PY
 marker='# Managed by darc-vpn configure-nginx-domains.sh'
@@ -70,4 +73,4 @@ certbot --nginx --non-interactive --agree-tos --redirect \
 nginx -t
 systemctl reload nginx
 echo 'NGINX_HTTPS_OK: API -> 127.0.0.1:18082; dashboard -> 127.0.0.1:3002.'
-echo 'O processo do dashboard ainda deve ser implantado na porta 3002; sem ele, o painel retorna 502.'
+echo 'Dashboard pode manter proxy Cloudflare ativo; use SSL/TLS Full (strict) após a emissão do certificado.'
