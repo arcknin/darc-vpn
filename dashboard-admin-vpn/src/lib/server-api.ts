@@ -37,7 +37,8 @@ export function getApiBaseUrl(): string {
     throw new Error("URL da API inválida");
   }
   const isDevelopment = process.env.NODE_ENV !== "production";
-  const localHttpAllowed = (localMode() || isDevelopment) && isLoopback(parsed.hostname);
+  const allowLoopbackApi = process.env.DASHBOARD_ALLOW_LOOPBACK_API === "true";
+  const localHttpAllowed = (localMode() || isDevelopment || allowLoopbackApi) && isLoopback(parsed.hostname);
   if (parsed.protocol !== "https:" && !localHttpAllowed) {
     throw new Error("A API exige HTTPS fora do modo local");
   }

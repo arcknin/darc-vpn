@@ -4,11 +4,13 @@ import {
   sanitizeAdminAccount,
   SESSION_COOKIE,
   SESSION_COOKIE_OPTIONS,
+  secureRequest,
 } from "../src/lib/server-api";
 
 const oldNodeEnv = process.env.NODE_ENV;
 const oldLocalMode = process.env.DASHBOARD_LOCAL_MODE;
 const oldApi = process.env.VPN_API_BASE_URL;
+const oldLoopback = process.env.DASHBOARD_ALLOW_LOOPBACK_API;
 const env = process.env as Record<string, string | undefined>;
 
 afterEach(() => {
@@ -18,9 +20,24 @@ afterEach(() => {
   else env.DASHBOARD_LOCAL_MODE = oldLocalMode;
   if (oldApi === undefined) delete env.VPN_API_BASE_URL;
   else env.VPN_API_BASE_URL = oldApi;
+  if (oldLoopback === undefined) delete env.DASHBOARD_ALLOW_LOOPBACK_API;
+  else env.DASHBOARD_ALLOW_LOOPBACK_API = oldLoopback;
 });
 
 describe("dashboard session boundary", () => {
+  it("permits explicit private loopback API without relaxing browser HTTPS", () => {
+    env.NODE_ENV = "production";
+    env.DASHBOARD_LOCAL_MODE = "false";
+    env.DASHBOARD_ALLOW_LOOPBACK_API = "true";
+    env.VPN_API_BASE_URL = "http://127.0.0.1:18082";
+    expect(getApiBaseUrl()).toBe("http://127.0.0.1:18082");
+    expect(secureRequest(new Request("http://dashboard-vpn.darcanix.com"))).toBe(false);
+    expect(secureRequest(new Request("http://localhost:3002", {
+      headers: { "x-forwarded-proto": "https" },
+    }))).toBe(true);
+    env.VPN_API_BASE_URL = "http://api.example.invalid";
+    expect(() => getApiBaseUrl()).toThrow(/HTTPS/);
+  });
   it("uses a secure HttpOnly SameSite cookie", () => {
     expect(SESSION_COOKIE).toBe("vpn_admin_session");
     expect(SESSION_COOKIE_OPTIONS).toMatchObject({

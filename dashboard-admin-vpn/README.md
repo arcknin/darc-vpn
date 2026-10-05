@@ -4,6 +4,8 @@ Dashboard Next.js do MVP VPN Access. O dashboard chama apenas as operações adm
 
 ## Execução local
 
+Para Docker na VPS Linux, consulte [as duas stacks](../infra/dashboard/README.md).
+
 Defina a URL da API explicitamente. O modo local permite uma API HTTP somente em loopback:
 
 ```sh
