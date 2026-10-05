@@ -1,5 +1,7 @@
 # Alvo com preservação de peers antigos
 
+Para atualizar o backend já migrado, use o [fluxo de atualização da API](../../scripts/api-update/README.md), com overlay Compose e backup. Não repetir a preparação/corte para uma atualização comum de código.
+
 Esta é a stack **API + WireGuard**. O dashboard tem Compose próprio em
 [`../dashboard/compose.yaml`](../dashboard/compose.yaml); consulte o
 [roteiro das duas stacks](../dashboard/README.md). A VPN já migrada usa o

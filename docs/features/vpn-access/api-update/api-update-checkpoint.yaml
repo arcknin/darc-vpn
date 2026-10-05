@@ -1,0 +1,18 @@
+schema_version: 1
+managed_by: spec-drive
+task: api-update
+status: completed_local_configuration
+stage: validation
+spec: spec.md
+discovery: discovery.md
+tdd_decision: 'yes'
+authority: prepare_test_publish_only_no_live_update
+completed:
+  - Added API-only Compose overlay and root runner against existing verified runtime model.
+  - Snapshot data with API paused; compare unchanged WireGuard container/start time; persist only image change.
+  - Failure attempts old image without automatic database restoration.
+  - Nine Python model/lifecycle tests passed with fake Docker; bash syntax and shellcheck passed.
+limitations:
+  - No real image build or VPS update executed; local Docker daemon stopped.
+  - Image rollback may require schema compatibility review for future migrations.
+resume_from: Owner root updates clone and runs scripts/api-update/update.sh; confirm API_UPDATE_OK and real API operations.

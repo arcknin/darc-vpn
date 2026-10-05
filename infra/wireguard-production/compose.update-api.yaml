@@ -1,0 +1,4 @@
+# Overlay the existing root-only runtime model; never start a second VPN stack.
+services:
+  api:
+    image: ${DARC_API_IMAGE:?Pinned API image ID is required}
