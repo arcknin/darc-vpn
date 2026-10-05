@@ -1,0 +1,40 @@
+name: darc-vpn-dashboard
+services:
+  dashboard:
+    image: darc-vpn-dashboard:local
+    build:
+      context: ../..
+      dockerfile: infra/dashboard/Dockerfile
+    # Linux VPS: use the existing host-loopback API without joining the VPN namespace.
+    network_mode: host
+    restart: unless-stopped
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+      - /app/.next/cache:rw,noexec,nosuid,size=64m,uid=10001,gid=10001
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: '1'
+      HOSTNAME: 127.0.0.1
+      PORT: '3002'
+      VPN_API_BASE_URL: http://127.0.0.1:18082
+      DASHBOARD_ALLOW_LOOPBACK_API: 'true'
+      DASHBOARD_LOCAL_MODE: 'false'
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3002/login').then(r=>process.exit(r.status===200?0:1)).catch(()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'

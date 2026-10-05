@@ -1,0 +1,19 @@
+schema_version: 1
+managed_by: spec-drive
+task: dashboard-stack
+status: completed_local_configuration
+stage: validation
+spec: spec.md
+discovery: discovery.md
+tdd_decision: 'yes'
+completed:
+  - Kept existing API/WireGuard Compose; added independent dashboard Compose and standalone Dockerfile.
+  - Red reproduced denied production-loopback API; green allows explicit loopback without relaxing browser HTTPS.
+  - 16 dashboard tests, typecheck, lint and standalone Next build passed.
+  - Both Compose models validated with docker-compose config --quiet; API template used dummy validation values.
+  - Local standalone server started successfully, then stopped.
+limitations:
+  - Docker image build unavailable because local Docker daemon is stopped.
+  - Automatic approval review rejected local HTTP smoke calls with reason Sem chamadas externas; no bypass attempted.
+  - No VPS deployment, real admin login, VPN recreation or browser integration evidence.
+resume_from: Update VPS clone from main, build/start only dashboard, then validate HTTPS/API login separately.

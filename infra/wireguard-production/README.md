@@ -1,5 +1,10 @@
 # Alvo com preservação de peers antigos
 
+Esta é a stack **API + WireGuard**. O dashboard tem Compose próprio em
+[`../dashboard/compose.yaml`](../dashboard/compose.yaml); consulte o
+[roteiro das duas stacks](../dashboard/README.md). A VPN já migrada usa o
+modelo runtime resolvido; não iniciar outra instância com este template.
+
 O 02b constrói as imagens com API e importador offline, cria a identidade a partir do backup root, importa registros legados separados de contas e cifra PSKs no SQLite. Não cria PrivateKeys de clientes nem associa antigos peers a usuários.
 
 O reconciliador restaura PSK/keepalive/AllowedIPs e reserva prefixes legados contra colisão de novos perfis. Pode preservar peers só IPv4 ou só IPv6; defaults /0 e sobreposição entre peers são recusados para revisão. Falta de chave mestra com banco existente falha fechada.

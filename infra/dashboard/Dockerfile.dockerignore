@@ -1,0 +1,11 @@
+**
+!dashboard-admin-vpn/
+!dashboard-admin-vpn/**
+dashboard-admin-vpn/node_modules
+dashboard-admin-vpn/.next
+dashboard-admin-vpn/out
+dashboard-admin-vpn/coverage
+dashboard-admin-vpn/.env*
+dashboard-admin-vpn/*.log
+dashboard-admin-vpn/*.tsbuildinfo
+**/.DS_Store

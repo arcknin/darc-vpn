@@ -9,6 +9,7 @@ Entrada: [vpn-access](features/vpn-access/feature.md).
 | [mvp](features/vpn-access/mvp/) | Produto e implementação local existentes; contrato rev. 2 e plano rev. 3 preservados | [Checkpoint legado](features/vpn-access/mvp/mvp-checkpoint.yaml) |
 | [wireguard-stack](features/vpn-access/wireguard-stack/) | Integração API/WireGuard validada em laboratório; migração posterior confirmada pelo operador | [Conclusão operacional](features/vpn-access/production-target/owner-migration-completion.md) e [validação local](features/vpn-access/wireguard-stack/validation.md) |
 | [app-integration](features/vpn-access/app-integration/) | Continuação Flutter/backend e túnel nativo; teste Android USB pendente | [Spec](features/vpn-access/app-integration/spec-01-app.md) e [checkpoint](features/vpn-access/app-integration/app-integration-checkpoint.yaml) |
+| [dashboard-stack](features/vpn-access/dashboard-stack/) | Compose separado do painel; stack API/WireGuard preservada | [Spec](features/vpn-access/dashboard-stack/spec.md) e [checkpoint](features/vpn-access/dashboard-stack/dashboard-stack-checkpoint.yaml) |
 
 ## Organização com spec-drive
 
