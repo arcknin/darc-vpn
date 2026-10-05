@@ -1,0 +1,11 @@
+TERMOS FICTÍCIOS PARA TESTE LOCAL
+
+Versão: test-v1
+Vigência: 29 de setembro de 2026
+Responsável: Operador Fictício de Testes
+Contato: testes@example.invalid
+Retenção de metadados: 30 dias
+
+Este texto existe apenas para validar o fluxo local automatizado. Ao aceitar,
+o usuário fictício confirma que leu as regras de uso, privacidade, bloqueio e
+tratamento de metadados descritas nesta fixture completa.

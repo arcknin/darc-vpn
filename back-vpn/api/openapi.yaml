@@ -1,0 +1,821 @@
+openapi: 3.0.3
+info:
+  title: VPN Access API
+  version: 0.1.0
+  description: >-
+    Contrato HTTP local do MVP de acesso VPN. Clientes devem usar transporte
+    HTTPS autenticado fora de testes locais. O contrato não fixa um host de API
+    ou de dashboard; o endpoint vpn.darcanix.com aparece somente como destino
+    WireGuard dentro de perfis.
+tags:
+  - name: health
+  - name: authentication
+  - name: terms
+  - name: profiles
+  - name: administration
+paths:
+  /readyz:
+    get:
+      operationId: readiness
+      summary: Confirma interface e sincronização inicial no modo kernel.
+      responses:
+        '200':
+          description: Pronto.
+        '503':
+          description: Interface ou reconciliação indisponível.
+  /healthz:
+    get:
+      tags: [health]
+      operationId: health
+      security: []
+      responses:
+        '200':
+          description: Serviço local disponível.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/v1/auth/friend/login:
+    post:
+      tags: [authentication]
+      operationId: friendLogin
+      security: []
+      x-allowed-roles: [friend]
+      x-requires-https: true
+      summary: Autentica uma conta de amigo.
+      description: >-
+        Credenciais desconhecidas e incorretas usam a mesma resposta para não
+        enumerar contas. A sessão retornada é opaca e deve ser enviada como
+        bearer token em transporte HTTPS.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Sessão de amigo criada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '423':
+          $ref: '#/components/responses/AccountBlocked'
+  /api/v1/auth/admin/login:
+    post:
+      tags: [authentication]
+      operationId: adminLogin
+      security: []
+      x-allowed-roles: [admin]
+      x-requires-https: true
+      summary: Autentica o administrador.
+      description: Credenciais inválidas não revelam se uma conta administrativa existe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Sessão administrativa criada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '423':
+          $ref: '#/components/responses/AccountBlocked'
+  /api/v1/auth/logout:
+    post:
+      tags: [authentication]
+      operationId: logout
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [friend, admin]
+      x-requires-https: true
+      responses:
+        '204':
+          description: Sessão revogada.
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+  /api/v1/terms/current:
+    get:
+      tags: [terms]
+      operationId: currentTerms
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [friend]
+      x-requires-https: true
+      summary: Retorna a versão inicial dos termos que aguarda aceite.
+      responses:
+        '200':
+          description: Documento de termos e hash dos bytes apresentados.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TermsDocument'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '423':
+          $ref: '#/components/responses/AccountBlocked'
+  /api/v1/terms/acceptance:
+    post:
+      tags: [terms]
+      operationId: acceptTerms
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [friend]
+      x-requires-https: true
+      summary: Registra o aceite eletrônico da versão inicial.
+      description: >-
+        O backend só libera perfis depois que o comprovante JSON persistente
+        foi gravado com sucesso. Falha de persistência mantém o gate fechado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TermsAcceptanceRequest'
+      responses:
+        '201':
+          description: Aceite gravado e associado à conta autenticada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TermsAcceptanceResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '423':
+          $ref: '#/components/responses/AccountBlocked'
+        '500':
+          $ref: '#/components/responses/AcceptancePersistenceFailed'
+  /api/v1/profiles:
+    get:
+      tags: [profiles]
+      operationId: listOwnProfiles
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [friend]
+      x-requires-https: true
+      x-requires-terms-acceptance: true
+      summary: Lista apenas os perfis da conta autenticada.
+      description: >-
+        A resposta é formada por DTOs públicos e não contém chave privada,
+        preshared key ou configuração exportável.
+      responses:
+        '200':
+          description: Perfis próprios visíveis após aceite.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileSummaryList'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '423':
+          $ref: '#/components/responses/AccountBlocked'
+        '428':
+          $ref: '#/components/responses/TermsAcceptanceRequired'
+  /api/v1/profiles/{profileId}:
+    get:
+      tags: [profiles]
+      operationId: getOwnProfile
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [friend]
+      x-requires-https: true
+      x-requires-terms-acceptance: true
+      summary: Consulta metadados de um perfil próprio.
+      parameters:
+        - $ref: '#/components/parameters/ProfileId'
+      responses:
+        '200':
+          description: Metadados públicos do perfil próprio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileSummary'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProfileNotFound'
+        '423':
+          $ref: '#/components/responses/AccountBlocked'
+        '428':
+          $ref: '#/components/responses/TermsAcceptanceRequired'
+  /api/v1/profiles/{profileId}/private:
+    get:
+      tags: [profiles]
+      operationId: recoverOwnPrivateProfile
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [friend]
+      x-requires-https: true
+      x-requires-terms-acceptance: true
+      summary: Recupera a configuração privada do perfil próprio.
+      description: >-
+        Este é o único contrato de entrega de material privado. A conta
+        autenticada precisa ser a proprietária do profileId e ter aceite
+        persistido; administradores não usam esta rota.
+      parameters:
+        - $ref: '#/components/parameters/ProfileId'
+      responses:
+        '200':
+          description: Configuração privada recuperada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfilePrivate'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProfileNotFound'
+        '423':
+          $ref: '#/components/responses/AccountBlocked'
+        '428':
+          $ref: '#/components/responses/TermsAcceptanceRequired'
+        '500':
+          $ref: '#/components/responses/ProfileRecoveryFailed'
+        '503':
+          description: profile_not_ready; peer sem confirmação ativa.
+  /api/v1/admin/accounts:
+    get:
+      tags: [administration]
+      operationId: listAccounts
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [admin]
+      x-requires-https: true
+      summary: Lista contas e metadados administrativos sem segredos.
+      responses:
+        '200':
+          description: Contas sob administração.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountList'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [administration]
+      operationId: createAccount
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [admin]
+      x-requires-https: true
+      summary: Cria uma conta de amigo com perfil principal automático.
+      description: Somente o papel admin pode criar contas.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+      responses:
+        '201':
+          description: Conta criada com perfil principal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountMetadata'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: pool_exhausted; nenhuma conta/perfil parcial é persistida.
+  /api/v1/admin/accounts/{accountId}:
+    get:
+      tags: [administration]
+      operationId: getAccount
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [admin]
+      x-requires-https: true
+      summary: Consulta uma conta e seus metadados de perfil.
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        '200':
+          description: Metadados administrativos sem chaves privadas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminAccountMetadata'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProfileNotFound'
+  /api/v1/admin/accounts/{accountId}/profiles:
+    post:
+      tags: [administration]
+      operationId: createAdditionalProfile
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [admin]
+      x-requires-https: true
+      summary: Adiciona um slot de perfil à conta.
+      description: >-
+        Cada slot é um perfil WireGuard com peer e par de chaves próprios.
+        A resposta contém somente metadados administrativos.
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfileRequest'
+      responses:
+        '201':
+          description: Perfil extra criado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminProfileMetadata'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProfileNotFound'
+        '409':
+          description: pool_exhausted; nenhuma conta/perfil parcial é persistida.
+  /api/v1/admin/accounts/{accountId}/block:
+    post:
+      tags: [administration]
+      operationId: blockAccount
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [admin]
+      x-requires-https: true
+      summary: Bloqueia acesso imediatamente e inicia revogação.
+      description: >-
+        A operação invalida sessões antes da tentativa de remoção dos peers.
+        Só retorna completed quando o servidor confirmar a remoção de todos os
+        peers ativos e persistentes; ausência ou resposta parcial mantém
+        pending/failed.
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        '202':
+          description: Bloqueio aplicado; revogação pendente ou confirmada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevocationOperation'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProfileNotFound'
+        '409':
+          $ref: '#/components/responses/RevocationNotConfirmed'
+  /api/v1/admin/accounts/{accountId}/revocation:
+    get:
+      tags: [administration]
+      operationId: getRevocation
+      security:
+        - bearerAuth: []
+      x-allowed-roles: [admin]
+      x-requires-https: true
+      summary: Consulta o estado agregado da revogação.
+      description: O dashboard deve preservar pending e failed sem promovê-los a completed.
+      parameters:
+        - $ref: '#/components/parameters/AccountId'
+      responses:
+        '200':
+          description: Estado por peer e estado agregado da operação.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevocationOperation'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ProfileNotFound'
+        '409':
+          $ref: '#/components/responses/RevocationNotConfirmed'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque-session
+      description: Token opaco emitido no login; sempre transportar por HTTPS.
+  parameters:
+    ProfileId:
+      name: profileId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  responses:
+    InvalidCredentials:
+      description: Credencial inválida sem enumeração de conta.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: invalid_credentials
+            message: credenciais inválidas
+    NotAuthenticated:
+      description: Sessão ausente, inválida ou expirada.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: not_authenticated
+            message: autenticação necessária
+    Forbidden:
+      description: Papel autenticado sem autorização para a operação.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: forbidden
+            message: operação não autorizada
+    AccountBlocked:
+      description: Conta bloqueada e sem acesso app/API.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: account_blocked
+            message: conta bloqueada
+    TermsAcceptanceRequired:
+      description: Aceite persistente exigido antes de entregar perfis privados.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: terms_acceptance_required
+            message: aceite dos termos necessário
+    ProfileNotFound:
+      description: Perfil ou conta não encontrado no escopo autorizado.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: profile_not_found
+            message: perfil não encontrado
+    ProfileRecoveryFailed:
+      description: Configuração privada não pôde ser recuperada.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: profile_recovery_failed
+            message: perfil não pôde ser recuperado
+    AcceptancePersistenceFailed:
+      description: Comprovante não pôde ser persistido; gate continua fechado.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: acceptance_persistence_failed
+            message: aceite não pôde ser persistido
+    RevocationNotConfirmed:
+      description: Revogação ainda não foi confirmada para todos os peers.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: revocation_not_confirmed
+            message: revogação não confirmada
+    InvalidRequest:
+      description: Pedido malformado ou incompatível com o estado atual.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            code: invalid_request
+            message: pedido inválido
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum:
+            - invalid_credentials
+            - not_authenticated
+            - forbidden
+            - account_blocked
+            - terms_acceptance_required
+            - profile_not_found
+            - profile_recovery_failed
+            - acceptance_persistence_failed
+            - revocation_not_confirmed
+            - invalid_request
+        message:
+          type: string
+          description: Mensagem segura sem segredo ou detalhe de enumeração.
+        eventId:
+          type: string
+          description: Identificador opcional para correlação sem conteúdo sensível.
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+    LoginRequest:
+      type: object
+      required: [username, password]
+      additionalProperties: false
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          format: password
+          minLength: 1
+    LoginResponse:
+      type: object
+      required: [accessToken, expiresAt, accountId, role]
+      properties:
+        accessToken:
+          type: string
+          description: Token opaco; não é uma chave WireGuard.
+        expiresAt:
+          type: string
+          format: date-time
+        accountId:
+          type: string
+        role:
+          type: string
+          enum: [friend, admin]
+    TermsDocument:
+      type: object
+      required: [version, text, sha256]
+      properties:
+        acceptanceRequired:
+          type: boolean
+          default: true
+          description: false apenas no teste privado; não representa aceite registrado.
+        version:
+          type: string
+          minLength: 1
+        text:
+          type: string
+          description: Bytes exatos apresentados ao usuário para aceite.
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+    TermsAcceptanceRequest:
+      type: object
+      required: [accepted, version, sha256]
+      additionalProperties: false
+      properties:
+        accepted:
+          type: boolean
+          enum: [true]
+        version:
+          type: string
+          minLength: 1
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+    TermsAcceptanceResponse:
+      type: object
+      required: [accepted, accountId, version, sha256, acceptedAt, eventId]
+      properties:
+        accepted:
+          type: boolean
+          enum: [true]
+        accountId:
+          type: string
+        version:
+          type: string
+        sha256:
+          type: string
+          pattern: '^[a-f0-9]{64}$'
+        acceptedAt:
+          type: string
+          format: date-time
+        eventId:
+          type: string
+    ProfileSummary:
+      type: object
+      required: [id, displayName, isPrimary, endpoint, peerPublicKey, address, allowedIPs, dns]
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        isPrimary:
+          type: boolean
+        endpoint:
+          type: string
+          enum: [vpn.darcanix.com]
+          description: Único endpoint VPN permitido neste MVP.
+        peerPublicKey:
+          type: string
+        address:
+          type: string
+        allowedIPs:
+          type: array
+          items: {type: string}
+        dns:
+          type: array
+          items: {type: string}
+    ProfileSummaryList:
+      type: object
+      required: [profiles]
+      properties:
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileSummary'
+    ProfilePrivate:
+      type: object
+      required: [id, displayName, endpoint, address, allowedIPs, dns, peerPublicKey, privateKey]
+      additionalProperties: false
+      properties:
+        serverPublicKey:
+          type: string
+          description: Chave pública do servidor no modo kernel; peerPublicKey continua sendo a chave do cliente.
+        endpointPort:
+          type: integer
+          minimum: 1
+          maximum: 65535
+        id:
+          type: string
+        displayName:
+          type: string
+        endpoint:
+          type: string
+          enum: [vpn.darcanix.com]
+        address:
+          type: string
+        allowedIPs:
+          type: array
+          items: {type: string}
+        dns:
+          type: array
+          items: {type: string}
+        peerPublicKey:
+          type: string
+        privateKey:
+          type: string
+          format: password
+          description: Segredo WireGuard entregue somente ao proprietário autenticado.
+        presharedKey:
+          type: string
+          format: password
+          description: Segredo opcional entregue somente ao proprietário autenticado.
+    AdminProfileMetadata:
+      type: object
+      required: [id, accountId, displayName, isPrimary, peerPublicKey, createdAt]
+      additionalProperties: false
+      description: DTO administrativo sem chave privada, preshared key ou configuração exportável.
+      properties:
+        provisioningState:
+          type: string
+          enum: [pending, ready, failed, revoked]
+        provisioningError:
+          type: string
+          description: Código sanitizado de falha.
+        id:
+          type: string
+        accountId:
+          type: string
+        displayName:
+          type: string
+        isPrimary:
+          type: boolean
+        peerPublicKey:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    AdminAccountMetadata:
+      type: object
+      required: [id, username, status, createdAt, primaryProfileId, profileCount, profiles]
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        status:
+          type: string
+          enum: [active, blocked]
+        createdAt:
+          type: string
+          format: date-time
+        primaryProfileId:
+          type: string
+        profileCount:
+          type: integer
+          minimum: 1
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminProfileMetadata'
+    AdminAccountList:
+      type: object
+      required: [accounts]
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminAccountMetadata'
+    CreateAccountRequest:
+      type: object
+      required: [username, password, primaryDisplayName]
+      additionalProperties: false
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          format: password
+          minLength: 1
+        primaryDisplayName:
+          type: string
+          minLength: 1
+    CreateProfileRequest:
+      type: object
+      required: [displayName]
+      additionalProperties: false
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+    PeerRevocation:
+      type: object
+      required: [profileId, peerId, removed]
+      properties:
+        profileId:
+          type: string
+        peerId:
+          type: string
+        removed:
+          type: boolean
+        error:
+          type: string
+    RevocationOperation:
+      type: object
+      required: [accountId, status, peers, updatedAt]
+      properties:
+        accountId:
+          type: string
+        status:
+          type: string
+          enum: [pending, failed, completed]
+        peers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeerRevocation'
+        error:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
