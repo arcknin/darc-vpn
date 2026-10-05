@@ -1,0 +1,115 @@
+schema_version: 1
+managed_by: orchestration-flow
+feature: vpn-access
+task: mvp
+status: paused
+stage: discovery
+discovery: discovery.md
+related_tasks:
+  - path: ../wireguard-stack/wireguard-stack-checkpoint.yaml
+    relationship: Completed direct wgctrl integration and disposable VPS lab; production migration and frontend still separate from local MVP.
+workers:
+  - name: contexto_wireguard
+    role: read-only research leaf
+    status: research_returned
+    scope: Read referenced chats segunda parte pós inicio and inicio; identify server WireGuard infrastructure prerequisites, without backend implementation or external operations.
+    evidence: discovery.md section Server infrastructure conversation reconciliation
+contract:
+  path: mvp-contract.md
+  revision: 2
+  status: approved
+  tdd: "yes"
+workspace: null
+active_task: null
+active_repositories: []
+completed_summary:
+  - Server integration continuation completed in wireguard-stack on 2026-10-04; kernel controller, unique dual-stack reservations and durable reconciliation supersede earlier fake-only source findings. Disposable VPS lab passed and was cleaned; production not migrated. See ../wireguard-stack/validation.md.
+  - 'Spec-drive continuation on 2026-10-04: directly inspected current sources and verified legacy contract/plan hashes. B01-B06 source remains present; Android tunnel bridge and local acceptance harness remain absent. About 18 GiB free; no build, tests or external checks run. See discovery.md.'
+  - Empty local directory inventoried; no Git repository or existing application files.
+  - Draft contract updated with six direct owner annotations; accidental form answers remain excluded.
+  - Android 7/API 24+, in-app VPN control, automatic login/configuration, admin-only account creation, and distinct peer/key per device recorded.
+  - vpn.darcanix.com reserved for the VPN endpoint; dashboard-vpn recorded as the panel name on the owner's VPS.
+  - Draft contract updated for optional QR export of every available profile, including the primary, to the official WireGuard app on an Apple device.
+  - Distinct profile slots have distinct peers/keys; copying one profile by QR reuses its identity for alternate use, with an in-app simultaneous-use warning.
+  - Owner confirmed encrypted backend storage and recovery of private profiles, one initial profile per account, administrator-created extra profiles, revocation of all profiles on account block, and TDD yes.
+  - Official WireGuard and Android documentation researched for multi-device and platform feasibility boundaries.
+  - Independent read-only review completed against frozen draft SHA-256 6d4ac584cf6f54b2881139eeb1562cfac6c610dffc459361157870caf289437e; findings were incorporated into later proposed ATDD.
+  - Owner selected the last-chosen Android profile behavior and delegated fast revocation tactics; proposed ATDD now covers consent, secret access, transport, and server-confirmed block completion.
+  - Contract revision 1 is ready for owner approval at SHA-256 467b6716a609b84f3893af22611520c3746bdc0c129a51ae405e7d89866efdee; TDD yes remains recorded.
+  - Owner approved contract revision 2 and ATDD with initial terms acceptance, JSON receipt, IP/time access metadata, and no stored browsing history; local code planning and implementation authorized, TDD yes preserved.
+  - Code plan revision 1 frozen against contract revision 2 and TDD yes; eight functional batches B01-B08, with B01 first.
+  - B01 completed locally: Go module, OpenAPI, domain/port boundaries, route metadata, local fakes, and contract tests; root reran go test, go vet, and gofmt successfully.
+  - Plan revision 2 corrected B02 Go module and B06 Flutter lockfile allowed scopes without changing approved behavior; B01 remains complete.
+  - B02 completed locally: SQLite identity/profile persistence, Argon2id, digest-only sessions, distinct WireGuard keys, AES-GCM recovery, and negative authorization tests; root reran race tests, vet, and gofmt successfully.
+  - Plan revision 3 assigned cmd/api composition and black-box HTTP checks to B03/B04; B01/B02 remain complete.
+  - B03 completed locally: fail-closed terms gate, atomic JSON proof, access metadata, and executable cmd/api; root verified package/race tests and permitted loopback HTTP test, vet, and gofmt.
+  - B04 completed locally: immediate account/session block, durable peer snapshot, confirmed revocation state machine, executable HTTP routes; root reran race tests, vet, and gofmt successfully.
+  - B05 dashboard source, 15 local tests, typecheck, lint, and Next build are complete; root reproduced tests/typecheck/lint after project-local offline dependency install. Browser E2E remains unrun.
+  - Read-only continuation on 2026-09-29 found B01-B06 source and tests in back-vpn, dashboard-admin-vpn, and front-vpn; no project has Git metadata. Earlier empty-inventory entries describe prior state, not current files.
+remaining:
+  - Rerun B06 APK build with currently available disk space and repeat relevant Flutter checks; run B05 browser E2E or record its exact environment limitation; then B07 native tunnel and B08 local acceptance.
+  - Resolve owner's new WireGuard isolation preference through a separate contract/operations decision before moving the active host wg0 or implementing a live controller; the frozen local plan does not include this migration.
+  - Map the six PostUp and six PostDown hooks and actual NAT/firewall behavior without exposing WireGuard secrets; prepare an on-host backup and rollback design before any container cutover.
+  - Resolve backend profile address allocation before live integration: current generator has only 253 possible 10.8.0.x/32 addresses with no database uniqueness, and profiles advertise ::/0 without a client IPv6 address. Confirm server peer AllowedIPs/pools and owner-approved address behavior.
+  - Define real peer provisioning as well as revocation for the container controller; current account/profile creation persists keys but never adds a peer to WireGuard. Decide durable reconciliation and single-writer/replica behavior before live use.
+  - SSH and isolated WireGuard lab are complete; live backend integration, DNS, deployment, and production cutover remain unperformed.
+  - Fill terms operator/contact and retention before publication and verify logging behavior across app/API, WireGuard, firewall, and DNS.
+  - Confirm the dashboard FQDN and API host; inspect WireGuard configuration through explicitly authorized read access before integration.
+  - Integrate with the existing WireGuard server only after its details and authority are available.
+evidence:
+  - docs/features/vpn-access/mvp/mvp-contract.md (approved revision 2; SHA-256 477a54dadf1fd064c5b4e2fe8c355b8d51ac157ca33537e7f8393cfb6972b683)
+  - docs/features/vpn-access/mvp/mvp-plan.md (frozen revision 3; SHA-256 0561be3fbda9c670f0c24a8bbf0995f76701d9fc9df71d47c873a8a1308a1ee7)
+  - B01 root verification: GOCACHE=/tmp/darc-vpn-go-cache go test ./... and go vet ./... passed; gofmt -l cmd internal test returned no files (back-vpn/, 2026-09-29).
+  - B02 root verification: GOCACHE=/tmp/darc-vpn-go-cache go test -race ./... and go vet ./... passed; gofmt -l cmd internal test migrations returned no files (back-vpn/, 2026-09-29).
+  - B03 root verification: all non-loopback Go race tests passed; cmd/api loopback race test passed with local bind permission after default sandbox denied bind; go vet and gofmt passed.
+  - B04 root verification: GOCACHE=/tmp/darc-vpn-go-cache go test -race ./... passed with local loopback permission; go vet and gofmt passed (back-vpn/, 2026-09-29).
+  - B06 worker: TDD red recorded; 10 Flutter tests, dart format, and flutter analyze passed; flutter build apk --debug failed ENOSPC in Gradle cache. Root freed only this task's /tmp Go cache, increasing free disk from about 143 MiB to 426 MiB.
+  - B05 worker reported 15 tests/typecheck/lint/build passed using transient dependency setup; root rerun after cleanup found npm test and typecheck exit 127 because vitest/tsc are absent. Same worker is correcting reproducibility.
+  - B05 correction: npm ci --offline installed 64 local packages; root reran npm test (15), typecheck, and lint successfully; executor's Next build passed. Playwright E2E skipped; disk about 125 MiB free after local node_modules install.
+  - B06 bounded APK retry failed ENOSPC in Gradle 8.14 transforms with no APK; front-vpn/build and .dart_tool generated artifacts were removed by the B06 executor only, restoring about 56 MiB. Source and lockfiles remain intact.
+  - Read-only continuation on 2026-09-29: df -h . reported 15 GiB available on the workspace volume; no build or tests were rerun. No APK/AAB was found, and B07 tunnel service/channel was not found in front-vpn source.
+  - Owner-authorized read-only SSH check on 2026-09-29: codex logged into srv1519215 (Ubuntu 25.10); wg and wg-quick exist, wg-quick@wg0 is active, and wg0 has 10.66.66.1/24 and fd42:42:42::1/64. The codex account could not read /etc/wireguard/wg0.conf or query wg0 details with wg. No server state was changed.
+  - Read-only VPS inventory on 2026-09-29: Docker and Nginx are active; wg0 remains a host-managed wg-quick service; the VPN configuration is inaccessible to codex. Owner expressed a preference to isolate WireGuard in a container but has not approved a migration design or cutover.
+  - Owner-provided root-shell report from srv1519215 at 2026-09-29T13:43:55Z: wg0 is enabled/active on host, listening on UDP 51442 with 10.66.66.1/24 and fd42:42:42::1/64, MTU 1420, three configured peers, two peers with a recorded handshake and one within 24 hours. The configuration reports six PostUp and six PostDown hooks, IPv4/IPv6 forwarding enabled, and three preshared keys. This is owner-provided evidence, not an independently repeated root inspection; no secret key values were shared.
+  - Owner-provided root-shell report shows /etc/wireguard/wg0.conf owned by root:root with mode 644; prior SSH inspection showed /etc/wireguard directory mode 700, so the file is not currently traversable by codex. Restricting the file itself to 600 is still prudent before migration.
+  - Owner stated the recent WireGuard usage is theirs and a brief cutover interruption is acceptable; this is owner-reported usage, not independent identification of all three peers or approval of a migration procedure.
+  - Owner-provided root-shell sanitized hook report on 2026-09-29: six PostUp and six PostDown entries use IPv4/IPv6 iptables to allow UDP input/forwarding and apply MASQUERADE on eth0; current iptables-save output shows repeated wg0 FORWARD accept rules. The report omitted source/destination values and hook commands, so exact NAT match conditions and rule provenance remain unverified.
+  - Read-only codex SSH inspection on 2026-09-29: Docker default bridge has IPv6 disabled and IPv4 subnet 172.17.0.0/16; current bridge containers have no IPv6 address, host default IPv4/IPv6 routes use eth0, and no container publishes UDP 51442. A separate test network/port is needed to validate containerized WireGuard without touching host wg0.
+  - Owner-provided root-shell firewall summary on 2026-09-29: IPv4 POSTROUTING has Docker-specific 172.17/16 and 172.18/16 masquerade rules plus three broad '-o eth0 -j MASQUERADE' entries; IPv6 POSTROUTING has two broad '-o eth0 -j MASQUERADE' entries; IPv4 INPUT has two UDP 51442 ACCEPT entries; no UDP 51442 match was returned from ip6tables INPUT. Duplicate rule provenance and IPv6 ingress policy were not established.
+  - Owner-authorized read-only SSH test as codex on 2026-09-29: host has an IPv6 default route via eth0 and HTTPS over IPv6 returned HTTP 200; Docker default bridge reports EnableIPv6=false and subnet 172.17.0.0/16; wg-quick@wg0 stayed active. This verifies host IPv6 connectivity, not WireGuard inside a container.
+  - Read-only code investigation on 2026-09-29: back-vpn/cmd/api/main.go addressForProfile uses one digest byte modulo 253 to produce 10.8.0.2-254/32; profiles.address lacks a UNIQUE constraint in migrations/001_b02_identity.sql. Client profiles advertise AllowedIPs 0.0.0.0/0 and ::/0 and IPv4/IPv6 DNS, but no client IPv6 address. Prefix mismatch with host wg0 10.66.66.1/24 is not alone proof of failure; live routes and peer AllowedIPs were not inspected.
+  - Read-only migration design on 2026-09-29 recommends a separate WG container in a tested dual-stack user-defined bridge with bounded NET_ADMIN capability and published UDP, separate unprivileged API/controller boundary, alternate-port disposable-peer test, protected backup, staged cutover, and rollback. No container/network was created and no live service changed.
+  - Read-only backend investigation on 2026-09-29: account/profile creation does not provision a WG peer; WireGuardController currently exposes only RemovePeers and ConfirmPeersRemoved and uses a fake implementation. Revocation has no automatic retry and its synchronization is process-local, so multi-replica behavior and durable reconciliation remain undefined.
+  - Owner-authorized disposable Docker WG lab on 2026-09-29: custom dual-stack bridge, Ubuntu-derived containers with NET_ADMIN/NET_RAW only, alternate UDP 51443, fresh handshakes over IPv4 and IPv6 endpoints, and 2/2 ICMP tunnel responses in each family passed. IPv4 internet egress through tunnel returned VPS public address. An initial IPv6 curl failed without retained stderr; a later instrumented WG cycle succeeded over verified HTTPS IPv6 (HTTP 200, exit 0) from the peer through wg0 with NAT66 counter advancement. This used two containers on the same VPS, not an independent external client.
+  - Post-lab independent codex SSH read confirmed zero darc-vpn-lab containers/networks/images, UDP 51443 unbound, and original wg-quick@wg0 active with unchanged 10.66.66.1/24 and fd42:42:42::1/64 addresses.
+  - Follow-up disposable Alpine bridge diagnosis on 2026-09-29: IPv6 ULA address and default route were assigned, DNS returned AAAA, and HTTPS over IPv6 returned HTTP 200 inside the container. Host IPv6 HTTPS returned 200 before and after; all diagnostic resources were removed and wg0 stayed active. In prior WG lab server peer AllowedIPs were restricted to test /32 and /128, so server default-route capture by that peer was not observed.
+  - Final instrumented WG cycle on 2026-09-29: container forwarding=1 and verified ca-certificates; server kept its IPv6 default route via bridge before/after wg-quick; peer handshake and 2/2 ICMPv6 succeeded, then verified curl -6 to www.cloudflare.com returned HTTP 200 exit 0 through wg0. NAT66 counter changed from 0 to 1 packet/80 bytes. No TLS bypass was used. Independent codex SSH after cleanup again found zero lab containers/networks/images, unbound UDP 51443, and original wg0 active with unchanged addresses.
+  - Owner-authorized Mac external-client lab on 2026-09-29: disposable server darc-vpn-lab-20260929-mac-server runs in a dual-stack Docker bridge with fresh server/client identities, UDP 51443 published for IPv4/IPv6, cap-drop ALL plus NET_ADMIN/NET_RAW, and restart=no. Private split-tunnel profile was transferred to /private/tmp/darc-vpn-lab-mac.conf with mode 0600; root independently verified 340-byte file, published port, and production wg-quick@wg0 active. VPS codex nohup cleanup PID 1485005 survived a new SSH session and is scheduled for 2026-09-29T16:11:11Z to remove lab container, network, volume, and image. At handoff the Mac had not activated the profile; external handshake and traffic remain unverified.
+  - Owner screenshot after activating the Mac WireGuard tunnel showed Active, endpoint 187.124.240.109:51443, a handshake 9 seconds earlier, 92 B received and 180 B sent. Root independently read the lab server at 2026-09-29T15:26Z: one peer had latest-handshake Unix 1790695541, with 212 B server RX and 92 B TX. This verifies the external Mac-to-container WireGuard handshake and initial encrypted packets, but no tunnel ICMP or application traffic yet.
+  - Owner confirmed electronic Li e aceito before profile/QR delivery and JSON acceptance proof at a persistent configurable backend system path; storage for existing account/profile/key data remains undecided.
+  - docs/features/vpn-access/mvp/terms-of-use-draft.md (unpublished draft; legal and logging details pending)
+  - Owner requested encryption wording, source IP plus time metadata for authenticated app/API calls and observable VPN connection events, no stored destination/content history, and lawful disclosure to investigating authorities; draft updated accordingly.
+  - Local inventory on 2026-09-28 found an empty directory and no Git repository.
+  - Read-only continuation check on 2026-09-29 confirmed only four feature documents, no Git repository, source code, tests, or code plan; contract SHA-256 still matches this checkpoint.
+  - https://www.wireguard.com/embedding/
+  - https://developer.android.com/develop/connectivity/vpn
+  - https://www.wireguard.com/papers/wireguard.pdf
+  - https://git.zx2c4.com/wireguard-android/commit/tunnel/build.gradle.kts?follow=1&id=2a017642822ccf95f673d3520f07d103f654f5f4
+  - https://apps.apple.com/us/app/wireguard/id1441195209
+  - https://git.zx2c4.com/wireguard-apple/tree/WireGuard/WireGuard/UI/iOS/QRScanViewController.swift?h=0.0.20181104-1&id=bede8a17ad292120e414051a8c833543e73197a0
+limitations:
+  - SSH login as codex is verified, but WireGuard configuration and peer details are inaccessible to that account; published terms with operator/retention and exact dashboard/API hostname remain unavailable.
+  - codex belongs to the docker group despite lacking sudo; this grants broad host authority and needs an explicit owner decision before relying on the account as restricted access.
+  - Owner-provided summary does not reveal the contents of PostUp/PostDown hooks or establish NAT/firewall equivalence; counts of rules mentioning wg0 do not prove absence of masquerade elsewhere. One peer had a handshake within 24 hours, so cutover has an active-client interruption risk.
+  - Sanitized hook classification confirms tool/chain/interface/target only, not the exact predicates, rule order, or whether duplicate FORWARD entries come from wg-quick or another process. IPv6 behavior in Docker bridge remains to be verified.
+  - The existing Docker default bridge lacks IPv6; a purpose-built network and IPv6 routing/NAT design must be tested. Known wg0 interface addresses do not overlap 172.17.0.0/16, but uninspected peer AllowedIPs could still affect routing.
+  - Existing broad and duplicate host NAT/firewall rules must not be copied or deleted blindly; rule ownership, IPv6 ingress policy, and exact rollback steps remain unverified.
+  - The host IPv6 HTTPS check does not prove IPv6 for a WireGuard container or client. Backend-generated IPv4 addresses can collide, and current IPv6 client profiles have no assigned client IPv6 address; these are live integration blockers, not resolved by Docker networking alone.
+  - A test WireGuard container would validate infrastructure only; it would not validate backend-created profiles or revocation until a real add/remove/confirm controller and address allocation are implemented.
+  - Lab demonstrated containerized handshake, bidirectional packets, and selected IPv4/IPv6 internet egress. The first IPv6 attempt failed without a retained error and its cause remains unknown; the later successful attempt used www.cloudflare.com. No independent external-client reachability, persistence across restart, backend integration, or production cutover was tested.
+  - The Mac profile is a temporary credential stored locally in /private/tmp; remove it after testing. The external lab expires at 2026-09-29T16:11:11Z. Its nohup cleanup survived logout verification but not necessarily VPS reboot; restart=no prevents server restart after reboot. External handshake is verified; tunnel IPv4/IPv6 traffic still needs Mac ping results.
+  - QR export exposes a reusable WireGuard credential; encryption and key-management details remain unplanned.
+  - Local backend and dashboard evidence exists; no Android APK, browser E2E, live WireGuard integration, DNS, deployment, or production validation.
+blocker: The isolated WG container feasibility test passed selected IPv4/IPv6 paths, but the owner-requested live move needs a separate feature-contract/operations decision and plan; backend address uniqueness, IPv6 client behavior, peer provisioning, revocation reconciliation, independent external-client validation, persistence, host firewall ownership, backup, and rollback remain unresolved. Local B06 validation remains independent.
+resume_from: Read discovery.md and preserve mvp-contract.md revision 2 and mvp-plan.md revision 3. Recommended local continuation is B06 analyze/test/APK and actually executed B05 browser E2E, then B07 native tunnel and B08 local acceptance. Disk shortage is historical, not currently demonstrated. Live integration and container migration need a linked specification and explicit operational authority. Historical Mac lab expiry has passed; present VPS/lab state and cleanup are unverified. Current request covered understanding and continuation discovery, not batch execution.
+updated_at: '2026-10-04T19:12:50Z'

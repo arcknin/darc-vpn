@@ -1,0 +1,34 @@
+schema_version: 1
+managed_by: spec-drive
+feature: vpn-access
+task: app-integration
+status: executing
+stage: implementation
+spec: {path: spec-01-app.md, revision: 1}
+discovery: discovery.md
+related_specs: []
+approvals:
+  owner_spec: current_front_back_continuation_and_legacy_mvp_scope
+  execution: local_code_tests_debug_build
+  external_authority: no_root_data_mutation_or_publication
+tdd_decision: 'yes'
+workspace: /Users/arcknin/Desktop/darc/softwares/darc-vpn
+active_task: app-integration
+active_repositories: [front-vpn, back-vpn]
+completed_summary:
+  - Confirmed client gaps and owner-selected Android USB; no device listed yet.
+  - Aligned server key/port serialization and private test session without false consent.
+  - Added backend acceptanceRequired metadata while preserving normal gate.
+  - 20 Flutter tests passed and analyze has no issues; Go race/vet green.
+  - Native WireGuard bridge/service and controls implemented; no Android runtime evidence yet.
+  - Debug manifest merge fixed; all Flutter analysis/test checks green.
+  - Multi-ABI build stalled on downloads/timeouts; scoped build to ARM64 debug for initial validation. No other cache/daemon/project removed.
+  - User disabled Mac VPN for dependency downloads; ADB repeatedly lists no USB device.
+  - TDD reproduced/fixed disconnected polling during Android consent; pending preparation remains busy.
+  - Final ARM64 Flutter debug APK compiled successfully (second incremental build 6.9s); packaged manifest/native libraries inspected.
+remaining: [USB installation and private API/tunnel integration evidence.]
+workers: []
+evidence: [discovery.md, spec-01-app.md, validation.md, android-usb-test.md]
+limitations: [Physical Android availability and private test account not yet verified.]
+blocker: null
+resume_from: Identify authorized USB device/ABI, install APK and execute private API/tunnel integration with operator test account; no root operations.

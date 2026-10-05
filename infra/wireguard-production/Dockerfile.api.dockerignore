@@ -1,0 +1,8 @@
+.lab.env
+.lab-owner
+source.tgz
+acceptance-results.json
+**/__pycache__
+front-vpn
+dashboard-admin-vpn
+docs

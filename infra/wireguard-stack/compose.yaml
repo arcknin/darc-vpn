@@ -1,0 +1,76 @@
+services:
+  wireguard:
+    image: ${LAB_ID:?}-wireguard:1
+    build:
+      context: ../..
+      dockerfile: infra/wireguard-stack/Dockerfile.wireguard
+    cap_drop: [ALL]
+    cap_add: [NET_ADMIN]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    environment:
+      WG_ADDRESS4: 10.77.77.1/24
+      WG_ADDRESS6: fd42:77:77::1/64
+      WG_POOL4: 10.77.77.0/24
+      WG_POOL6: fd42:77:77::/64
+      WG_PORT: ${LAB_WG_PORT:?}
+    sysctls:
+      net.ipv4.ip_forward: '1'
+      net.ipv6.conf.all.forwarding: '1'
+    networks: [lab]
+    ports:
+      - '${LAB_WG_PORT:?}:${LAB_WG_PORT:?}/udp'
+      - '127.0.0.1:${LAB_API_PORT:?}:8080/tcp'
+    volumes:
+      - identity:/identity
+    healthcheck:
+      test: [CMD, ip, link, show, wg0]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+  api:
+    image: ${LAB_ID:?}-api:1
+    build:
+      context: ../..
+      dockerfile: infra/wireguard-stack/Dockerfile.api
+    network_mode: service:wireguard
+    depends_on:
+      wireguard:
+        condition: service_healthy
+        restart: true
+    cap_drop: [ALL]
+    cap_add: [NET_ADMIN]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    environment:
+      VPN_MODE: container-lab
+      VPN_WIREGUARD_MODE: kernel
+      VPN_WG_INTERFACE: wg0
+      VPN_POOL4: 10.77.77.0/24
+      VPN_POOL6: fd42:77:77::/64
+      VPN_ENDPOINT_PORT: ${LAB_WG_PORT:?}
+      API_ADDR: 0.0.0.0:8080
+      VPN_DB_PATH: /data/vpn.db
+      VPN_ACCEPTANCE_DIR: /data/acceptances
+      VPN_TERMS_VERSION: lab-fictional-v1
+      VPN_TERMS_PATH: /app/terms.txt
+      VPN_ADMIN_USERNAME: lab-admin
+      VPN_ADMIN_PASSWORD: ${LAB_ADMIN_PASSWORD:?}
+      VPN_CONTROLLER_AUDIT_TOKEN: ${LAB_AUDIT_TOKEN:?}
+    volumes:
+      - data:/data
+    healthcheck:
+      test: [CMD, /app/api, health]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+networks:
+  lab:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.30.77.0/24
+        - subnet: fd42:30:77::/64
+volumes:
+  identity:
+  data:

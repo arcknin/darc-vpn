@@ -1,0 +1,49 @@
+schema_version: 1
+managed_by: spec-drive
+feature: vpn-access
+task: wireguard-stack
+status: completed
+stage: completed
+spec:
+  path: spec-01-stack.md
+  revision: 1
+discovery: discovery.md
+related_specs: []
+approvals:
+  design_path: owner_selected_shared_network_namespace_and_wgctrl
+  owner_spec: approved_revision_1
+  execution: completed_in_scope
+  external_authority: approved_disposable_vps_lab_executed_and_cleaned_production_excluded
+tdd_decision: 'yes'
+workspace: /Users/arcknin/Desktop/darc/softwares/darc-vpn
+active_task: null
+active_repositories: []
+completed_summary:
+  - Managed SQLite reservations/intents, serialized provisioning/revocation/reconciliation, writer lock and explicit kernel/fake modes delivered.
+  - Additive serverPublicKey/endpointPort and administrative provisioning fields documented in OpenAPI; frontend remains separate.
+  - Two-container Compose/bootstrap/images with pinned bases validated on Linux VPS; shared namespace and NET_ADMIN only, without privileged mode or Docker socket.
+  - TDD red/green recorded; final 38 top-level Go tests passed with race detector, vet and formatting checks.
+  - Real kernel lab passed dual-stack tunnel/verified HTTPS, authorization/terms, live revocation, API/WG restarts and joint recreation; revoked peer remained rejected.
+  - Kernel access denied without NET_ADMIN; inspected runtime logs contain no fixture credentials/tokens/private keys.
+  - Lab containers/networks/volumes/named images and remote staging removed; ports free. Production service/interface index/addresses unchanged.
+  - Remote and local backend implementation fingerprints match ce50bc9a013421fbf223e0956753544e8b603cdc2396db1df7938cad79c8d141.
+remaining: []
+follow_up_outside_scope:
+  - Plan/authorize production migration using sanitized root inventory, existing identities/peers, persistent configuration, TLS/hosts, terms, backup and rollback.
+  - Update frontend QR/native integration to consume serverPublicKey and endpointPort; continue MVP B05/B06/B07/B08 separately.
+workers: []
+evidence:
+  - validation.md
+  - evidence/acceptance-results.json
+  - evidence/cleanup-results.json
+  - ../../../README.md
+  - infra/wireguard-stack/README.md (workspace-relative)
+limitations:
+  - Client runtime proof used disposable client on same VPS; external Mac handshake belongs to prior lab, not this full integrated suite.
+  - Host reboot, production cutover, actual production peer traffic and application were not tested.
+  - Production observable state unchanged; protected production key/config were not directly inspected.
+  - Shared base images/build caches were retained; no global prune used.
+  - No Git metadata, commit or push; source evidence uses file fingerprint and test commands.
+blocker: null
+resume_from: Scope complete. Read validation.md before planning a separately authorized production migration or frontend continuation. No lab is left running. Preserve MVP contract/plan and all unrelated work.
+updated_at: '2026-10-04T20:51:04Z'

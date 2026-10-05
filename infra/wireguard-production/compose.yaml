@@ -1,0 +1,68 @@
+services:
+  wireguard:
+    image: ${PROD_WG_IMAGE:?}
+    cap_drop: [ALL]
+    cap_add: [NET_ADMIN]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    environment:
+      WG_ADDRESS4: 10.66.66.1/24
+      WG_ADDRESS6: fd42:42:42::1/64
+      WG_POOL4: 10.66.66.0/24
+      WG_POOL6: fd42:42:42::/64
+      WG_PORT: '51442'
+    sysctls:
+      net.ipv4.ip_forward: '1'
+      net.ipv6.conf.all.forwarding: '1'
+    networks: [vpn]
+    ports:
+      - '51442:51442/udp'
+      - '127.0.0.1:18082:8080/tcp'
+    volumes:
+      - ${PROD_ROOT:?}/identity:/identity:ro
+    healthcheck:
+      test: [CMD, ip, link, show, wg0]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+  api:
+    image: ${PROD_API_IMAGE:?}
+    network_mode: service:wireguard
+    depends_on:
+      wireguard:
+        condition: service_healthy
+        restart: true
+    cap_drop: [ALL]
+    cap_add: [NET_ADMIN]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    environment:
+      VPN_MODE: container-private
+      VPN_WIREGUARD_MODE: kernel
+      VPN_WG_INTERFACE: wg0
+      VPN_POOL4: 10.66.66.0/24
+      VPN_POOL6: fd42:42:42::/64
+      VPN_ENDPOINT_PORT: '51442'
+      API_ADDR: 0.0.0.0:8080
+      VPN_DB_PATH: /data/vpn.db
+      VPN_ACCEPTANCE_DIR: /data/acceptances
+      VPN_TERMS_VERSION: ${PROD_TERMS_VERSION:?}
+      VPN_TERMS_PATH: /terms/terms.txt
+      VPN_ADMIN_USERNAME: ${PROD_ADMIN_USERNAME:?}
+      VPN_ADMIN_PASSWORD: ${PROD_ADMIN_PASSWORD:?}
+      VPN_CONTROLLER_AUDIT_TOKEN: ${PROD_AUDIT_TOKEN:?}
+    volumes:
+      - ${PROD_ROOT:?}/data:/data
+      - ${PROD_ROOT:?}/terms:/terms:ro
+    healthcheck:
+      test: [CMD, /app/api, health]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+networks:
+  vpn:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.30.88.0/24
+        - subnet: fd42:30:88::/64

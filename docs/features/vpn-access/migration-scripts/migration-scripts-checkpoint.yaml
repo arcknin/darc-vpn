@@ -1,0 +1,46 @@
+schema_version: 1
+managed_by: spec-drive
+feature: vpn-access
+task: migration-scripts
+status: completed_delivery
+stage: delivery
+spec:
+  path: spec-01-scripts.md
+  revision: 1
+discovery: discovery.md
+related_specs: []
+approvals:
+  owner_spec: direct_request_write_and_upload_scripts
+  execution: local_package_and_codex_upload_only
+  external_authority: code_upload_and_nonprivileged_checks_only_root_operations_by_owner
+tdd_decision: 'yes'
+workspace: /Users/arcknin/Desktop/darc/softwares/darc-vpn
+active_task: null
+active_repositories: []
+completed_summary:
+  - Owner root ran inspect and backup-only prepare successfully; sanitized inventory recorded in owner-inventory.md. Host hooks/NAT classified; no cutover performed.
+  - Five Bash entries plus shared driver and stdlib JSON/config helper created.
+  - Test-first parser/protection checks passed; 11 local tests, Bash syntax and ShellCheck green.
+  - Protected inventory/backup, strict production prerequisites, frozen target model and independent rollback timer encoded.
+  - Packaged and uploaded to codex directory; no root inventory or migration executed.
+remaining: []
+workers: []
+evidence:
+  - owner-inventory.md
+  - validation.md
+  - scripts/wireguard-migration/README.md (workspace-relative)
+  - scripts/wireguard-migration/SHA256SUMS (workspace-relative)
+remote_delivery:
+  alias: darc-vpn
+  user: codex
+  directory: /home/codex/darc-vpn-migration-20261004
+  archive: /home/codex/darc-vpn-migration-20261004/bundle.tar.gz
+  archive_sha256: 01f8ef519aa28f5baac5d2373a7005902ac72a6d6b792fcdc1466544b58ee213
+limitations:
+  - Privileged flows not runtime-tested; only owner will run root operations.
+  - Current lab stack lacks legacy peer/PSK import and production configuration; cutover must remain blocked until real restore/reconcile proof and reviewed target exist.
+  - Root must freeze and verify the package outside the codex-writable directory before executing it.
+  - Rollback does not globally restore firewall and can require manual repair if original hooks fail; timer does not cover host reboot.
+blocker: null
+resume_from: Owner inspection and backup are complete; read owner-inventory.md. Next specify production deployment and durable legacy-peer/PSK import, test cold restore/reconciliation, then prepare the real plan. No further broad inventory request at this milestone. Cutover remains blocked; assistant has not executed root operations.
+updated_at: '2026-10-04T21:38:41Z'

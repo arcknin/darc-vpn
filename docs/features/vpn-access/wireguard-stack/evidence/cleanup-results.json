@@ -1,0 +1,24 @@
+{
+  "backend_implementation_sha256": "ce50bc9a013421fbf223e0956753544e8b603cdc2396db1df7938cad79c8d141",
+  "lab_containers": 0,
+  "lab_named_images": 0,
+  "lab_networks": 0,
+  "lab_volumes": 0,
+  "lab_ports_free": [
+    51443,
+    18081
+  ],
+  "production_observable_state_unchanged": true,
+  "production": {
+    "addresses": [
+      "10.66.66.1/24",
+      "fd42:42:42::1/64"
+    ],
+    "ifindex": 3,
+    "service": "active"
+  },
+  "production_key_directly_inspected": false,
+  "host_reboot_tested": false,
+  "shared_base_images_and_build_cache_pruned": false,
+  "remote_staging_removed": true
+}

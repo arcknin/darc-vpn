@@ -1,0 +1,15 @@
+{
+  "results": [
+    "API authorization, terms, distinct identities and dual-stack reservations",
+    "real kernel handshake and IPv4/IPv6 tunnel plus verified HTTPS egress",
+    "all account peers removed; session and live traffic rejected",
+    "API restart recovered active peers",
+    "WireGuard restart and API relink recovered active peers",
+    "joint container recreation preserved server identity and active peers",
+    "revoked peer stays rejected after recreation",
+    "kernel access denied without NET_ADMIN",
+    "runtime logs contain no fixture tokens, passwords or private keys"
+  ],
+  "production_cutover": false,
+  "host_reboot_tested": false
+}

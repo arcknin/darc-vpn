@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "project": "darc-vpn-prod-main",
+  "compose_file": "/opt/darc-vpn-production/compose.yaml",
+  "env_file": "/opt/darc-vpn-production/production.env",
+  "restore_proof": "/root/darc-vpn-production-evidence/restore-proof.json",
+  "traffic_proof": "/root/darc-vpn-production-evidence/client-verification.json",
+  "rollback_delay_seconds": 600
+}

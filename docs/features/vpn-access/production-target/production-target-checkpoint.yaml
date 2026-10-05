@@ -1,0 +1,50 @@
+schema_version: 1
+managed_by: spec-drive
+feature: vpn-access
+task: production-target
+status: delivered_private_test_waiting_owner
+stage: private_test_delivery
+spec:
+  path: spec-01-production-target.md
+  revision: 1
+discovery: discovery.md
+related_specs: []
+approvals:
+  owner_spec: direct_02b_request_bounded_preparation_subset
+  execution: local_implementation_tests_package_authorized
+  external_authority: owner_root_operations_separate
+tdd_decision: 'yes'
+workspace: /Users/arcknin/Desktop/darc/softwares/darc-vpn
+active_task: production-target
+active_repositories: [back-vpn]
+completed_summary:
+  - Delivered and verified v3 private-test package; no terms file or acceptance required by backend in explicit test mode, no false final review flags.
+  - Go race/vet and 14 script tests green; operator will execute real private-test preparation. No source WG change or root operation by assistant.
+  - Owner explicitly ordered deferring final terms/retention and removing terms barriers for private functional tests; private-test backend/preparation implemented.
+  - Owner confirmed Lucas Reis as responsible, project/contact and retention policy; terms-v1.0-proposed.md prepared for owner reading, not published/uploaded.
+  - Owner reported LEGACY_IMPORT_OK and both real-data cold restore cycles with reconciliation OK; host VPN remained active and no cutover performed. See owner-02b-results.md.
+  - Owner settings diagnostics: root-owned mode0600, review flags false and terms_file nonexistent; final settings/API proof remains pending.
+  - V2 uploaded and verified as codex; archive SHA256 13d53351331b8e77cb0f000e136d89037076ec99b1ff03b33448e67d1b37e1d9. Non-root 02b refused; host WG active.
+  - Auto-review initially rejected full source upload; source-only audit and hostname/user/ownership checks supplied new evidence and retry was authorized.
+  - Implemented encrypted legacy registry/import, prefix reservation and PSK/keepalive restoration with separate identity from app accounts.
+  - Created 02b with offline import and two isolated cold restores, optional real settings/API test, no source WG stop.
+  - Local Go race/vet and script/stdlib tests green; real-data/Linux root preparation remains operator action.
+  - Read decisive controller/storage/crypto/bootstrap sources and owner-provided root inventory.
+  - Drafted integrated legacy-peer/PSK preservation and production-target spec.
+remaining:
+  - Define/implement retention enforcement and verify privacy/connection-event claims before final terms review. See terms-readiness.md.
+  - Owner reads terms-v1.0-proposed.md; close retention/log operation and legal connection-record classification before creating final server file.
+  - Complete production network/terms review, rerun 02b with settings, prepare final plan, then separately operator cutover/acceptance.
+workers: []
+evidence: [discovery.md, spec-01-production-target.md, owner-02b-results.md, ../migration-scripts/owner-inventory.md]
+limitations:
+  - Backend/script preparation implemented and tested locally; root cold restoration is owner-reported, not independently inspected. No root data access by assistant.
+  - Production settings/API readiness/external client acceptance remain pending; cold restoration passed per owner report.
+blocker: null
+resume_from: Deliver verified v3 package. Owner runs 02b --private-test, then prepares technical plan; terms/retenção are deferred until user release. Keep technical backup/identity/PSK/rollback protections; no assistant root execution.
+updated_at: '2026-10-04T23:05:22Z'
+
+remote_delivery:
+  user: codex
+  directory: /home/codex/darc-vpn-migration-20261004-v3
+  archive_sha256: 651ca74d8eacb34f667eb6e51f0599cdf18770eb12faf33686ad888132df5428
