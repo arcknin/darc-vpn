@@ -4,12 +4,12 @@ feature: vpn-access
 task: app-integration
 status: executing
 stage: implementation
-spec: {path: spec-01-app.md, revision: 1}
+spec: {path: spec-01-app.md, revision: 2}
 discovery: discovery.md
 related_specs: []
 approvals:
   owner_spec: current_front_back_continuation_and_legacy_mvp_scope
-  execution: local_code_tests_debug_build
+  execution: local_code_tests_debug_and_https_profile_build
   external_authority: no_root_data_mutation_or_publication
 tdd_decision: 'yes'
 workspace: /Users/arcknin/Desktop/darc/softwares/darc-vpn
@@ -26,9 +26,14 @@ completed_summary:
   - User disabled Mac VPN for dependency downloads; ADB repeatedly lists no USB device.
   - TDD reproduced/fixed disconnected polling during Android consent; pending preparation remains busy.
   - Final ARM64 Flutter debug APK compiled successfully (second incremental build 6.9s); packaged manifest/native libraries inspected.
-remaining: [USB installation and private API/tunnel integration evidence.]
+  - USB device now connected, Android API35 arm64-v8a; Darc VPN process observed.
+  - Service-unavailable report diagnosed missing USB reverse and Mac SSH tunnel; both restored, internal VPS API health passed.
+  - Owner reported app worked after USB/SSH restoration, then requested production-like test over public HTTPS without USB dependence.
+  - HTTPS profile APK built (131.9s), version1.0.0-test.2/code2, cleartext false and compiled public URL verified.
+  - Development certificate matches previous installed debug APK; update installation supported without removing app data.
+remaining: [Public login and VPN runtime evidence.]
 workers: []
 evidence: [discovery.md, spec-01-app.md, validation.md, android-usb-test.md]
-limitations: [Physical Android availability and private test account not yet verified.]
+limitations: [Public HTTPS probe rejected by automatic approval review with reason Sem chamadas externas; no app VPN handshake proof.]
 blocker: null
-resume_from: Identify authorized USB device/ABI, install APK and execute private API/tunnel integration with operator test account; no root operations.
+resume_from: Owner installs darc-vpn-private-test-https.apk over previous APK and tests HTTPS login/VPN without USB/SSH. No root operations.

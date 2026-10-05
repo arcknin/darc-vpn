@@ -13,3 +13,15 @@
 ADB não encontrou dispositivo conectado nas consultas desta execução. Não houve instalação, consentimento Android real, login na API real, handshake ou tráfego pelo túnel deste aplicativo. Compilação e testes fake não fecham essa prova.
 
 O acesso SSH/adb reverse e a conta nova de teste continuam pendentes conforme [roteiro USB](android-usb-test.md). Não houve alteração de root, contas/dados reais, imagem API na VPS ou publicação.
+
+## Retomada USB — 2026-10-05
+
+Aparelho Android API35/arm64-v8a conectado e processo Darc VPN presente. Logs filtrados do app não mostraram exceção. Ao relatar indisponibilidade, não havia adb reverse nem listener SSH no Mac; configurados reverse18082 e túnel SSH loopback18082. Listener e reverse confirmados; checagem interna da API VPS passou. Login real e tráfego do túnel do aplicativo ainda aguardam nova tentativa do dono; isso não é prova de autenticação/handshake.
+
+## APK de teste HTTPS — 2026-10-05
+
+Dono informou que funcionou após restaurar transporte USB/SSH e pediu teste independente do Mac. Build profile/AOT concluído em 131,9s: `darc-vpn-private-test-https.apk`, versão1.0.0-test.2/code2, aproximadamente39,5MB, engine ARM64/API24+. PRIVATE_TEST=true, ALLOW_INSECURE_API=false, API pública HTTPS. URL `https://vpn.darcanix.com` encontrada no binário compilado. Manifesto final usesCleartextTraffic=false; profile permanece debuggable para diagnóstico, não é distribuição definitiva.
+
+Assinatura verificada com apksigner: CN=Android Debug; certificado SHA256 `5c57f3ec118ea2f04d75f4afc06f2857d15d9ac80529c9f55602993fa3e372b0`, idêntico ao debug anterior. SHA256 APK `f48ea4a23675c54622ccc611a2f1db367b10124255b91d6a7a1fb15c91681fdf`.
+
+Não houve instalação automática, atualização da VPS ou login público por este APK. Aprovação automática rejeitou a consulta HTTPS de validação com motivo `Sem chamadas externas`; sem contorno. Login público/handshake/tráfego dependem de teste no aparelho.

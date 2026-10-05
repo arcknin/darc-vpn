@@ -26,6 +26,17 @@ sem aceite quando a API indica esse modo; não registra consentimento fictício.
 O [roteiro Android USB](../docs/features/vpn-access/app-integration/android-usb-test.md)
 descreve o acesso à API privada por SSH e `adb reverse`.
 
+Para testar com acesso público HTTPS sem depender do Mac/USB:
+
+```bash
+bash ../scripts/app-integration/build-https-test-apk.sh
+```
+
+Este build profile/AOT usa a chave de desenvolvimento, API
+`https://vpn.darcanix.com`, HTTP desabilitado e modo de teste privado sem
+termos. O build release mantém seu gate normal. Consulte o
+[roteiro atualizado](../docs/features/vpn-access/app-integration/android-usb-test.md).
+
 ## Verificação
 
 ```sh

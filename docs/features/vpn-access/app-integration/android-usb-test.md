@@ -1,5 +1,19 @@
 # Validação privada Android USB
 
+## Teste HTTPS independente do Mac
+
+O dono pediu em 2026-10-05 que o APK principal de teste use o endpoint público:
+
+```bash
+bash scripts/app-integration/build-https-test-apk.sh
+```
+
+Saída: `front-vpn/build/app/outputs/flutter-apk/darc-vpn-private-test-https.apk`. Build profile/AOT, versão1.0.0-test.2/code2, ARM64/API24+, API `https://vpn.darcanix.com`, HTTP desabilitado, assinatura de desenvolvimento. PRIVATE_TEST=true preserva teste sem aceite. Não é release assinada para distribuição definitiva.
+
+Esse APK não precisa de adb reverse nem SSH no Mac. USB pode servir para instalação/logs. API HTTPS/Nginx e endpoint UDP51442 ainda precisam funcionar na VPS; login real e VPN devem ser validados no aparelho. A consulta HTTPS automática foi rejeitada pela aprovação automática (`Sem chamadas externas`), sem tentativa de contorno.
+
+## Transporte USB alternativo / histórico
+
 A implementação local compilou; [evidência](validation.md). APK debug usa API_BASE_URL=http://127.0.0.1:18082, ALLOW_INSECURE_API=true, PRIVATE_TEST=true. Não publicar esse build. Release mantém cleartext false e fluxo normal de aceite.
 
 1. Conectar Android, ativar depuração USB e autorizar o Mac. `adb devices -l` deve mostrar um único device autorizado; nenhum device foi encontrado no primeiro inventário.

@@ -3,7 +3,7 @@ schema_version: 1
 managed_by: spec-drive
 feature: vpn-access
 task: app-integration
-revision: 1
+revision: 2
 status: authorized_local_continuation
 ---
 
@@ -11,16 +11,18 @@ status: authorized_local_continuation
 
 ## Contexto e escopo
 
+Emenda autorizada em 2026-10-05: dono pediu teste semelhante à produção, independente de USB/SSH. APK de teste profile/AOT usa `https://vpn.darcanix.com`, cleartext desabilitado, assinatura de desenvolvimento e PRIVATE_TEST=true. Mantém teste privado sem termos; build release/publicação definitiva continua fora. USB fica disponível para diagnóstico, não como transporte obrigatório da API.
+
 [Discovery](discovery.md). Continuar MVP aprovado (B06/B07/B08), com emendas técnicas decorrentes da API real e ordem expressa de teste privado sem termos. Pedido atual autoriza código e validação local; escolha Android USB direciona prova runtime. Sem root, mutação de contas reais, publicação, release assinada ou DNS/proxy neste trabalho.
 
 ## Objetivo e comportamento
 
 - DTO privado valida serverPublicKey e endpointPort; config [Peer] usa chave do servidor e porta da API, conservando chave/identidade do cliente e PSK.
-- Backend informa acceptanceRequired explicitamente no documento de termos. App usa sinal false em build privada de debug para pular aceite sem gravar consentimento falso; compatibilidade debug com API v3 reservada private-technical-test até atualização. Release/fluxo normal mantém gate obrigatório.
+- Backend informa acceptanceRequired explicitamente no documento de termos. App usa sinal false em build privada debug/profile para pular aceite sem gravar consentimento falso; compatibilidade com API v3 reservada private-technical-test até atualização. Release/fluxo normal mantém gate obrigatório.
 - Login carrega perfis e principal/última seleção. Selecionar não conecta; alterar seleção com túnel ativo não migra. Conexão só por botão e pelo perfil selecionado.
 - Native bridge prepare/start/stop/state via MethodChannel/EventChannel, biblioteca oficial WireGuard tunnel versão fixada, API24+. Negação da permissão, falha ou revogação retorna estado real desconectado/erro. Nunca imprimir config/PrivateKey/PSK nos erros.
 - UI distingue interface VPN ativa de handshake/internet verificados. Callback/consulta local decide estado; retorno de pedido não basta. Logout desliga túnel controlado pelo app antes de limpar sessão. Não persistir config secreta nem fazer auto-conexão.
-- Acesso de teste: túnel SSH local18082 → VPS loopback18082; Android USB adb reverse. HTTP somente em build debug explícita; manifesto release continua cleartext false. Sem alterar DNS/endpoint VPN vpn.darcanix.com.
+- Acesso principal de teste: HTTPS público em vpn.darcanix.com. Alternativa técnica: SSH local18082 → VPS loopback18082 com Android USB adb reverse. HTTP somente em debug explícita; profile/release continuam cleartext false. Sem alterar endpoint UDP da VPN.
 
 ## Ordem e arquivos
 
